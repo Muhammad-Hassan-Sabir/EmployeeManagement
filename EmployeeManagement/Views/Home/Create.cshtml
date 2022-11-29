@@ -1,0 +1,59 @@
+﻿@model CreateEmployeeViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<form enctype="multipart/form-data" asp-controller="home" asp-action="Create" method="post">
+
+    <div class="form-group row">
+
+        <label asp-for="Name" class="col-sm-2 col-form-label">Name</label>
+       <div class="col-sm-3">
+        <input asp-for="Name" type="text" class="form-control" placeholder="Name" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+       </div>
+    </div>
+       <div class="form-group row pt-1">
+
+        <label asp-for="Email" class="col-sm-2 col-form-label">Email</label>
+       <div class="col-sm-3">
+        <input asp-for="Email" type="email" class="form-control" placeholder="Email" />
+         <span asp-validation-for="Email" class="text-danger"></span>
+       </div>
+    </div>
+     <div class="form-group row pt-1">
+
+        <label asp-for="Department" class="col-sm-2 col-form-label">Department</label>
+       <div class="col-sm-3">
+       <select asp-for="Department" asp-items="Html.GetEnumSelectList<Dept>()" class=" form-select ">
+
+           <option value="">Please Select</option>
+
+       </select>
+          <span asp-validation-for="Department" class="text-danger"></span>
+       </div>
+    </div>
+    <div class="form-group row pt-1">
+
+        <label asp-for="Photo" class="col-sm-2 col-form-label">Photo</label>
+       <div class="col-sm-3">
+        <div class="custom-file">
+                <input multiple asp-for="Photo" class="form-control custom-file-input">
+               
+            </div>
+       </div>
+    </div>
+    @*<div asp-validation-summary="All" class="text-danger"></div>*@
+    <div class="row pt-2">
+        <div  class="col-sm-3 offset-sm-2">
+          <button type="submit" class="btn btn-primary">Create</button>
+
+        </div>
+    </div>
+
+
+
+
+</form>
