@@ -1,5 +1,7 @@
 using EmployeeManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 
@@ -8,7 +10,16 @@ builder.Logging.ClearProviders();
 builder.Logging.AddNLog();
 // Add services to the container.
 //builder.Services.AddRazorPages();
-builder.Services.AddMvc();
+
+//Add Authorization Policy Globally
+builder.Services.AddMvc(options =>
+{   
+    var policy=new AuthorizationPolicyBuilder()
+               .RequireAuthenticatedUser()
+               .Build();
+    options.Filters.Add(new AuthorizeFilter(policy));
+
+});
 builder.Services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
 builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDBConnection"))

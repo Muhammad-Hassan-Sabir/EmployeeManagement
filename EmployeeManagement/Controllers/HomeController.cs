@@ -1,10 +1,12 @@
 ﻿using EmployeeManagement.Models;
 using EmployeeManagement.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace EmployeeManagement.Controllers
 {
+  
     public class HomeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
@@ -15,7 +17,7 @@ namespace EmployeeManagement.Controllers
             _employeeRepository = employeeRepository;
             this.webHostEnvironment = webHostEnvironment;
         }
-
+        [AllowAnonymous]
         public ViewResult Index()
         {
             // retrieve all the employees
@@ -23,7 +25,7 @@ namespace EmployeeManagement.Controllers
             // Pass the list of employees to the view
             return View(model);
         }
-
+        [AllowAnonymous]
         public ViewResult Details(int? id)
         {
             //throw new Exception("Error in Details View");
