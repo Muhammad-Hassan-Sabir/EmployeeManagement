@@ -5,8 +5,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - EmployeeManagement</title>
+
     <environment include="Development">
          <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
     </environment>
 
     <environment exclude="Development">
@@ -45,15 +50,12 @@
                     <ul class="navbar-nav ml-auto">
                     @if (signInManager.IsSignedIn(User))
                     {
-                        
                             <li class="nav-item">
                                 <form method="post" asp-action="logout" asp-controller="account">
                                         <button type="submit" class="nav-link btn btn-link py-0" style="width:auto">Logout @User.Identity.Name</button>
                                 </form>
                                 
                             </li>
-                       
-
                     }
                     else{
                         <li class="nav-item">

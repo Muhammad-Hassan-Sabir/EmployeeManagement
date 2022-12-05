@@ -6,19 +6,20 @@ using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Logging.ClearProviders();
-builder.Logging.AddNLog();
+
 // Add services to the container.
 //builder.Services.AddRazorPages();
 
+//log configuration
+builder.Logging.ClearProviders();
+builder.Logging.AddNLog();
 //Add Authorization Policy Globally
 builder.Services.AddMvc(options =>
-{   
-    var policy=new AuthorizationPolicyBuilder()
+{
+    var policy = new AuthorizationPolicyBuilder()
                .RequireAuthenticatedUser()
                .Build();
     options.Filters.Add(new AuthorizeFilter(policy));
-
 });
 builder.Services.AddScoped<IEmployeeRepository, SQLEmployeeRepository>();
 builder.Services.AddDbContextPool<AppDbContext>(options =>

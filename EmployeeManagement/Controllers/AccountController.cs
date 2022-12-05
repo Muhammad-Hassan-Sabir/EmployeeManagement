@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly SignInManager<IdentityUser> signInManager;
@@ -23,9 +24,23 @@ namespace EmployeeManagement.Controllers
             return View();
         }
 
-        [HttpPost]
+        [AcceptVerbs("Get", "Post")]
         [AllowAnonymous]
+        public async Task<IActionResult> IsEmailInUse(string email)
+        {
+            var user = await userManager.FindByEmailAsync(email);
 
+            if (user == null)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"Email {email} is already in use.");
+            }
+        }
+            [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (ModelState.IsValid)
@@ -50,8 +65,6 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
-       
-
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
@@ -61,7 +74,6 @@ namespace EmployeeManagement.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-
         public IActionResult Login()
         {
             return View();
@@ -69,14 +81,18 @@ namespace EmployeeManagement.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel)
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string? returnUrl=null)
         {
             if (ModelState.IsValid)
             {
                 var result = await signInManager.PasswordSignInAsync(loginViewModel.Email, loginViewModel.Password,
                                                                      loginViewModel.RememberMe, false);
-                if (result.Succeeded)
+
+                if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    return Redirect(returnUrl);
+                }
+                else
                 {
                     return RedirectToAction("index", "home");
                 }
