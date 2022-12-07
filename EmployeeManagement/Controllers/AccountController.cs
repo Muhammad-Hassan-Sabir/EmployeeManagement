@@ -1,4 +1,5 @@
-﻿using EmployeeManagement.ViewModels;
+﻿using EmployeeManagement.Models;
+using EmployeeManagement.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -8,10 +9,10 @@ namespace EmployeeManagement.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private readonly SignInManager<IdentityUser> signInManager;
-        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public AccountController(SignInManager<IdentityUser> signInManager, UserManager<IdentityUser> userManager)
+        public AccountController(SignInManager<ApplicationUser> signInManager, UserManager<ApplicationUser> userManager)
         {
             this.signInManager = signInManager;
             this.userManager = userManager;
@@ -45,7 +46,7 @@ namespace EmployeeManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new IdentityUser { UserName = registerViewModel.Email, Email = registerViewModel.Email };
+                var user = new ApplicationUser { UserName = registerViewModel.Email, Email = registerViewModel.Email,City=registerViewModel.City };
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
                 if (result.Succeeded)
                 {

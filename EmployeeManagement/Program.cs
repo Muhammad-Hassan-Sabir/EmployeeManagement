@@ -26,7 +26,7 @@ builder.Services.AddDbContextPool<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("EmployeeDBConnection"))
 );
 //configure password setting for user register
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequiredUniqueChars = 3;
     options.Password.RequiredLength = 10;
