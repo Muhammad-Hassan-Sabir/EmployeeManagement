@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace EmployeeManagement.Models
+﻿namespace EmployeeManagement.Models
 {
     public class SQLEmployeeRepository : IEmployeeRepository
     {
@@ -27,6 +25,7 @@ namespace EmployeeManagement.Models
             context.SaveChanges();
             return employee;
         }
+
         public Employee Delete(int Id)
         {
             Employee employee = context.Employees.Find(Id);
@@ -37,16 +36,13 @@ namespace EmployeeManagement.Models
             }
             return employee;
         }
+
         public Employee Update(Employee employeeChanges)
         {
             var employee = context.Employees.Attach(employeeChanges);
-            employee.State=Microsoft.EntityFrameworkCore.EntityState.Modified;
+            employee.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             context.SaveChanges();
             return employeeChanges;
-
-
         }
-
-      
     }
-    }
+}
