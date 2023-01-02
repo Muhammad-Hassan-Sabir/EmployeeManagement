@@ -6,7 +6,6 @@ using System.Net;
 
 namespace EmployeeManagement.Controllers
 {
-  
     public class HomeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
@@ -17,6 +16,7 @@ namespace EmployeeManagement.Controllers
             _employeeRepository = employeeRepository;
             this.webHostEnvironment = webHostEnvironment;
         }
+
         [AllowAnonymous]
         public ViewResult Index()
         {
@@ -25,6 +25,7 @@ namespace EmployeeManagement.Controllers
             // Pass the list of employees to the view
             return View(model);
         }
+
         [AllowAnonymous]
         public ViewResult Details(int? id)
         {

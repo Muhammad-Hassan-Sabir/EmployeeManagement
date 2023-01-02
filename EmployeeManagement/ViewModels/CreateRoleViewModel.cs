@@ -6,6 +6,5 @@ namespace EmployeeManagement.ViewModels
     {
         [Required]
         public string RoleName { get; set; }
-
     }
 }

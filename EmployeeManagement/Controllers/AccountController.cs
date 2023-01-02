@@ -40,16 +40,21 @@ namespace EmployeeManagement.Controllers
                 return Json($"Email {email} is already in use.");
             }
         }
-            [HttpPost]
+
+        [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = registerViewModel.Email, Email = registerViewModel.Email,City=registerViewModel.City };
+                var user = new ApplicationUser { UserName = registerViewModel.Email, Email = registerViewModel.Email, City = registerViewModel.City };
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
                 if (result.Succeeded)
                 {
+                    if (signInManager.IsSignedIn(User)&& User.IsInRole("Admin"))
+                    {
+                        return RedirectToAction("AllUsers", "Administration");
+                    }
                     await signInManager.SignInAsync(user, isPersistent: false);
                     return RedirectToAction("index", "home");
                 }
@@ -82,7 +87,7 @@ namespace EmployeeManagement.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string? returnUrl=null)
+        public async Task<IActionResult> Login(LoginViewModel loginViewModel, string? returnUrl = null)
         {
             if (ModelState.IsValid)
             {
@@ -102,6 +107,13 @@ namespace EmployeeManagement.Controllers
             }
 
             return View(loginViewModel);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

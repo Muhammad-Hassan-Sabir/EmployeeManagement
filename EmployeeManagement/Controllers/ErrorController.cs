@@ -12,6 +12,7 @@ namespace EmployeeManagement.Controllers
         {
             this.logger = logger;
         }
+
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)
         {
@@ -26,13 +27,14 @@ namespace EmployeeManagement.Controllers
 
             return View("NotFound");
         }
+
         [Route("Error")]
         [AllowAnonymous]
         public IActionResult Error()
         {
             var exceptionHandlerPathFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-           
-            logger.LogError($@"500 Error  ExceptionPath={exceptionHandlerPathFeature.Path} 
+
+            logger.LogError($@"500 Error  ExceptionPath={exceptionHandlerPathFeature.Path}
                                           ExceptionMessage={exceptionHandlerPathFeature.Error.Message}
                                           StackTrace={exceptionHandlerPathFeature.Error.StackTrace}");
 

@@ -1,10 +1,12 @@
 ﻿using EmployeeManagement.Models;
 using EmployeeManagement.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EmployeeManagement.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdministrationController : Controller
     {
         private readonly Microsoft.AspNetCore.Identity.RoleManager<IdentityRole> roleManager;
@@ -49,7 +51,12 @@ namespace EmployeeManagement.Controllers
 
             return View(createRoleViewModel);
         }
-
+        [HttpGet]
+        public IActionResult AllUsers()
+        {
+            var allUsers = userManager.Users;
+            return View(allUsers);
+        }
         [HttpGet]
         public IActionResult AllRoles()
         {
