@@ -3,6 +3,7 @@ using EmployeeManagement.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace EmployeeManagement.Controllers
 {
@@ -228,5 +229,38 @@ namespace EmployeeManagement.Controllers
             //await context.SaveChangesAsync();
             return RedirectToAction("EditRole", new { id = id });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"Not Found Role by {id}";
+                return View("NotFound");
+            }
+            else
+            {
+               
+                    var resDelete = await userManager.DeleteAsync(user);
+                    if (resDelete.Succeeded)
+                    {
+                        return RedirectToAction("AllUsers", "Administration");
+                    }
+                else
+                {
+                    foreach (var error in resDelete.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                }
+                return View("AllUsers");
+              
+
+            }
+
+        }
+
+
     }
 }
