@@ -63,7 +63,60 @@ namespace EmployeeManagement.Controllers
             var allRoles = roleManager.Roles;
             return View(allRoles);
         }
+        [HttpGet]
+        public async Task<IActionResult> EditUser(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"Not Found User by {id}";
+                return View("NotFound");
+            }
+            var roles = await userManager.GetRolesAsync(user);
+            var claims = await userManager.GetClaimsAsync(user);
+            EditUserViewModel editUserViewModel = new()
+            {
+                Id = id,
+                UserName = user.UserName,
+                Email = user.Email,
+                City = user.City,
+                Claims = claims.Select(x => x.Value).ToList(),
+                Roles = roles
+            };
+           
 
+            return View(editUserViewModel);
+            
+        }
+        [HttpPost]
+        public async Task<IActionResult> EditUser(EditUserViewModel editUserViewModel)
+        {
+            var user = await userManager.FindByIdAsync(editUserViewModel.Id);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"Not Found User by {editUserViewModel.Id}";
+                return View("NotFound");
+            }
+            else
+            {
+                user.UserName = editUserViewModel.UserName;
+                user.Email = editUserViewModel.Email;
+                user.City = editUserViewModel.City;
+                var result=await userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return  RedirectToAction("AllUsers", "Administration");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                    return View(editUserViewModel);
+                }
+            }
+        }
         [HttpGet]
         public async Task<IActionResult> EditRole(string id)
         {
