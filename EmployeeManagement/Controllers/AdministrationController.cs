@@ -236,7 +236,7 @@ namespace EmployeeManagement.Controllers
             var user = await userManager.FindByIdAsync(id);
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"Not Found Role by {id}";
+                ViewBag.ErrorMessage = $"Not Found User by {id}";
                 return View("NotFound");
             }
             else
@@ -259,6 +259,29 @@ namespace EmployeeManagement.Controllers
 
             }
 
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteRole(string id)
+        {
+            var role = await roleManager.FindByIdAsync(id);
+            if (role==null)
+            {
+                ViewBag.ErrorMessage = $"Not Found Role by {id}";
+                return View(@"NotFound");
+
+            }
+          
+            var result = await roleManager.DeleteAsync(role);
+            if (result.Succeeded)
+            {
+                return  RedirectToAction("AllRoles");
+            }
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+
+            }
+            return View("AllRoles");
         }
 
 

@@ -16,6 +16,11 @@ namespace EmployeeManagement.Models
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
+            foreach (var foriegn in modelBuilder.Model.GetEntityTypes()
+                                                    .SelectMany(x=>x.GetForeignKeys()))
+            {
+                foriegn.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
     }
 }
