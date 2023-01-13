@@ -51,7 +51,7 @@ namespace EmployeeManagement.Controllers
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
                 if (result.Succeeded)
                 {
-                    if (signInManager.IsSignedIn(User)&& User.IsInRole("Admin"))
+                    if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                     {
                         return RedirectToAction("AllUsers", "Administration");
                     }
