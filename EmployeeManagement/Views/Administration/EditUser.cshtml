@@ -70,22 +70,20 @@
         <div class="card-body">
             @if (Model.Claims.Any())
             {
-                foreach (var role in Model.Roles)
+                foreach (var claim in Model.Claims)
                 {
 
-                    <h5 class="card-title">@role</h5>
+                    <h5 class="card-title">@claim</h5>
                 }
             }
             else
             {
                  <h5 class="card-title">None at the moment</h5>
-
-
             }
         </div>
          <div class="card-footer">
-            <a href="#" class="btn btn-primary" style="width:auto">
-                User Roles
+            <a asp-action="ManageUserClaims" asp-route-id=@Model.Id class="btn btn-primary" style="width:auto">
+                Manage Claims
             </a>
         </div>
     </div>

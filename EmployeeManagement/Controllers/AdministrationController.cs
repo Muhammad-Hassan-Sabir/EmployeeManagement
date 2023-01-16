@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Security.Claims;
 
 namespace EmployeeManagement.Controllers
 {
@@ -56,7 +57,36 @@ namespace EmployeeManagement.Controllers
 
             return View(createRoleViewModel);
         }
+        [HttpGet]
+        public async Task<IActionResult> ManageUserClaims(string id)
+        {
+            List<UserClaim> userClaims = new List<UserClaim>();
+            ApplicationUser? user = await userManager.FindByIdAsync(id);
+            if (user is null)
+            {
+                ViewBag.ErrorMessage = $"Not Found User by id({id})";
+                return View("NotFound");
+            }
+            IList<Claim>? userHasClaims = await userManager.GetClaimsAsync(user);
+            foreach (Claim claim in ClaimsStore.AllClaims)
+            {
+                UserClaim userClaim = new UserClaim()
+                {
+                    ClaimType = claim.Type,
+                    IsSelected = userHasClaims.Any(x => x.Type == claim.Type)
+                };
+                userClaims.Add(userClaim);
+            }
+            UserClaimsViewModel userClaimsViewModel = new UserClaimsViewModel()
+            {
+                UserId = id,
+                Claims = userClaims
+            };
 
+
+            return View(userClaimsViewModel);
+        }
+      
         [HttpGet]
         public async Task<IActionResult> ManageUserRoles(string id)
         {
@@ -65,7 +95,7 @@ namespace EmployeeManagement.Controllers
             ViewBag.userId = user.Id;
             if (user is null)
             {
-                ViewBag.ErrorMessage = $"Not Found User by {id}";
+                ViewBag.ErrorMessage = $"Not Found User by id({id})";
                 return View("NotFound");
             }
             foreach (var role in roleManager.Roles.ToList())
@@ -102,7 +132,7 @@ namespace EmployeeManagement.Controllers
             var user = await userManager.FindByIdAsync(id);
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"Not Found User by {id}";
+                ViewBag.ErrorMessage = $"Not Found User by id({id})";
                 return View("NotFound");
             }
             var roles = await userManager.GetRolesAsync(user);
@@ -126,7 +156,7 @@ namespace EmployeeManagement.Controllers
             var user = await userManager.FindByIdAsync(editUserViewModel.Id);
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"Not Found User by {editUserViewModel.Id}";
+                ViewBag.ErrorMessage = $"Not Found User by id({editUserViewModel.Id})";
                 return View("NotFound");
             }
             else
@@ -265,7 +295,7 @@ namespace EmployeeManagement.Controllers
             var user = await userManager.FindByIdAsync(id);
             if (user == null)
             {
-                ViewBag.ErrorMessage = $"Not Found User by {id}";
+                ViewBag.ErrorMessage = $"Not Found User by id({id})";
                 return View("NotFound");
             }
             else
@@ -326,7 +356,7 @@ namespace EmployeeManagement.Controllers
             List<string> addRoles = new List<string>();
             if (user is null)
             {
-                ViewBag.ErrorMessage = $"Not Found User by {id}";
+                ViewBag.ErrorMessage = $"Not Found User by id({id})";
                 return View("NotFound");
             }
             foreach (var role in userRolesViewModels)
@@ -351,6 +381,54 @@ namespace EmployeeManagement.Controllers
 
             return RedirectToAction("EditUser", new { id = id });
         }
+        [HttpPost]
+        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model)
+        {
+            ApplicationUser? user = await userManager.FindByIdAsync(model.UserId);
+            if (user is null)
+            {
+                ViewBag.ErrorMessage = $"Not Found User by id({model.UserId})";
+                return View("NotFound");
+            }
+
+            IList<Claim>? userHasClaims=await userManager.GetClaimsAsync(user);
+            List<Claim> removeClaims = new List<Claim>();
+            List<Claim> addClaims = new List<Claim>();
+
+            foreach (UserClaim claim in model.Claims)
+            {
+                if (claim.IsSelected && !(userHasClaims.Any(x=>x.Type==claim.ClaimType)))
+                {
+                    addClaims.Add(new (claim.ClaimType,claim.ClaimType));
+                }
+                else if(!(claim.IsSelected) && (userHasClaims.Any(x => x.Type == claim.ClaimType)))
+                {
+                    removeClaims.Add(new(claim.ClaimType, claim.ClaimType));
+                }
+            }
+            if (addClaims.Count > 0)
+            {
+                IdentityResult? res = await userManager.AddClaimsAsync(user, addClaims);
+                if (!res.Succeeded)
+                {
+                    ModelState.AddModelError("", "Cannot add selected claims to user");
+                    return View(model);
+                }
+            }
+            if (removeClaims.Count > 0)
+            {
+                IdentityResult? res = await userManager.RemoveClaimsAsync(user, removeClaims);
+                if (!res.Succeeded)
+                {
+                    ModelState.AddModelError("", "Cannot remove user existing claims");
+                    return View(model);
+                }
+            }
+           
+
+            return RedirectToAction("EditUser", new { id=model.UserId});
+        }
+
 
     }
 }

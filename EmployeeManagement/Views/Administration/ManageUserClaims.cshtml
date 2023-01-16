@@ -1,0 +1,33 @@
+﻿@model UserClaimsViewModel 
+@{
+    ViewData["Title"] = "ManageUserRoles";
+
+}
+
+<h1>Manage User Claims</h1>
+<form method="post">
+<input asp-for="@Model.UserId" type="hidden">
+ <div class="card mb-3">
+            <div class="card-header">
+                Add or Remove claims from this user
+            </div>
+            <div class="card-body">
+                  
+            @for (int i = 0; i < Model.Claims.Count; i++)
+            {
+                        <div class="form-check m-1">
+                           <input asp-for="@Model.Claims[i].ClaimType" type="hidden">
+                            <input asp-for="@Model.Claims[i].IsSelected">
+                            <label asp-for="@Model.Claims[i].IsSelected">
+                                @Model.Claims[i].ClaimType
+                            </label>
+                        </div>
+            }
+            <div asp-validation-summary="All" class="text-danger"></div>
+            </div>
+            <div class="card-footer">
+                    <input style="width:auto" type="submit" value="Update" class="btn btn-primary"></input>
+                    <a asp-controller="administration" asp-action="EditUser" asp-route-id="@Model.UserId"  class="btn btn-danger">Cancel</a>
+            </div>
+        </div>
+</form>
