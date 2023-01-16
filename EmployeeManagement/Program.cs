@@ -33,6 +33,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 })
 .AddEntityFrameworkStores<AppDbContext>();
 
+builder.Services.AddAuthorization(option =>
+{
+    option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role")
+                                                                                .RequireClaim("Create Role"));
+
+    option.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
+});
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

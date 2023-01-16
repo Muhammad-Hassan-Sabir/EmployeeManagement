@@ -9,22 +9,20 @@ using System.Security.Claims;
 
 namespace EmployeeManagement.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
+    [Authorize(Policy = "AdminRolePolicy")]
     public class AdministrationController : Controller
     {
         private readonly Microsoft.AspNetCore.Identity.RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly AppDbContext context;
         private readonly ILogger<AdministrationController> logger;
 
         public AdministrationController(RoleManager<IdentityRole> roleManager,
                                         UserManager<ApplicationUser> userManager,
-                                        AppDbContext context,
                                         ILogger<AdministrationController> logger)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
-            this.context = context;
             this.logger = logger;
         }
 
@@ -57,6 +55,7 @@ namespace EmployeeManagement.Controllers
 
             return View(createRoleViewModel);
         }
+
         [HttpGet]
         public async Task<IActionResult> ManageUserClaims(string id)
         {
@@ -83,10 +82,9 @@ namespace EmployeeManagement.Controllers
                 Claims = userClaims
             };
 
-
             return View(userClaimsViewModel);
         }
-      
+
         [HttpGet]
         public async Task<IActionResult> ManageUserRoles(string id)
         {
@@ -317,6 +315,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
+        [Authorize(policy: "    ")]
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
@@ -381,6 +380,7 @@ namespace EmployeeManagement.Controllers
 
             return RedirectToAction("EditUser", new { id = id });
         }
+
         [HttpPost]
         public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model)
         {
@@ -391,17 +391,17 @@ namespace EmployeeManagement.Controllers
                 return View("NotFound");
             }
 
-            IList<Claim>? userHasClaims=await userManager.GetClaimsAsync(user);
+            IList<Claim>? userHasClaims = await userManager.GetClaimsAsync(user);
             List<Claim> removeClaims = new List<Claim>();
             List<Claim> addClaims = new List<Claim>();
 
             foreach (UserClaim claim in model.Claims)
             {
-                if (claim.IsSelected && !(userHasClaims.Any(x=>x.Type==claim.ClaimType)))
+                if (claim.IsSelected && !(userHasClaims.Any(x => x.Type == claim.ClaimType)))
                 {
-                    addClaims.Add(new (claim.ClaimType,claim.ClaimType));
+                    addClaims.Add(new(claim.ClaimType, claim.ClaimType));
                 }
-                else if(!(claim.IsSelected) && (userHasClaims.Any(x => x.Type == claim.ClaimType)))
+                else if (!(claim.IsSelected) && (userHasClaims.Any(x => x.Type == claim.ClaimType)))
                 {
                     removeClaims.Add(new(claim.ClaimType, claim.ClaimType));
                 }
@@ -424,11 +424,8 @@ namespace EmployeeManagement.Controllers
                     return View(model);
                 }
             }
-           
 
-            return RedirectToAction("EditUser", new { id=model.UserId});
+            return RedirectToAction("EditUser", new { id = model.UserId });
         }
-
-
     }
 }

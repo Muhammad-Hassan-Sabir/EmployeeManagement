@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace EmployeeManagement.Models
+﻿namespace EmployeeManagement.Models
 {
     public class EmployeeRepository : IEmployeeRepository
     {
@@ -13,7 +11,6 @@ namespace EmployeeManagement.Models
             new Employee() { Id = 1, Name = "Mary", Department = Dept.HR, Email = "mary@pragimtech.com" },
             new Employee() { Id = 2, Name = "John", Department = Dept.IT, Email = "john@pragimtech.com" },
             new Employee() { Id = 3, Name = "Sam", Department = Dept.IT, Email = "sam@pragimtech.com" },
-           
         };
         }
 
