@@ -19,7 +19,8 @@ namespace EmployeeManagement.Controllers
 
         public AdministrationController(RoleManager<IdentityRole> roleManager,
                                         UserManager<ApplicationUser> userManager,
-                                        ILogger<AdministrationController> logger)
+                                        ILogger<AdministrationController> logger
+                                        )
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
@@ -72,7 +73,7 @@ namespace EmployeeManagement.Controllers
                 UserClaim userClaim = new UserClaim()
                 {
                     ClaimType = claim.Type,
-                    IsSelected = userHasClaims.Any(x => x.Type == claim.Type)
+                    IsSelected = userHasClaims.Any(x => x.Type == claim.Type && x.Value=="true")
                 };
                 userClaims.Add(userClaim);
             }
@@ -127,21 +128,21 @@ namespace EmployeeManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> EditUser(string id)
         {
-            var user = await userManager.FindByIdAsync(id);
+            ApplicationUser? user = await userManager.FindByIdAsync(id);
             if (user == null)
             {
                 ViewBag.ErrorMessage = $"Not Found User by id({id})";
                 return View("NotFound");
             }
-            var roles = await userManager.GetRolesAsync(user);
-            var claims = await userManager.GetClaimsAsync(user);
+            IList<string>? roles = await userManager.GetRolesAsync(user);
+            IList<Claim>? claims = await userManager.GetClaimsAsync(user);
             EditUserViewModel editUserViewModel = new()
             {
                 Id = id,
                 UserName = user.UserName,
                 Email = user.Email,
                 City = user.City,
-                Claims = claims.Select(x => x.Value).ToList(),
+                Claims = claims.Select(x =>x.Type +" : "+ x.Value).ToList(),
                 Roles = roles
             };
 
@@ -179,6 +180,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> EditRole(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
@@ -209,6 +211,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "EditRolePolicy")]
         public async Task<IActionResult> EditRole(EditRoleViewModel editRoleViewModel)
         {
             var role = await roleManager.FindByIdAsync(editRoleViewModel.Id);
@@ -288,6 +291,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "DeleteRolePolicy")]
         public async Task<IActionResult> DeleteUser(string id)
         {
             var user = await userManager.FindByIdAsync(id);
@@ -315,7 +319,7 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost]
-        [Authorize(policy: "    ")]
+        [Authorize(Policy ="DeleteRolePolicy")]
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
@@ -392,38 +396,56 @@ namespace EmployeeManagement.Controllers
             }
 
             IList<Claim>? userHasClaims = await userManager.GetClaimsAsync(user);
-            List<Claim> removeClaims = new List<Claim>();
-            List<Claim> addClaims = new List<Claim>();
 
-            foreach (UserClaim claim in model.Claims)
+            if (userHasClaims.Any())
             {
-                if (claim.IsSelected && !(userHasClaims.Any(x => x.Type == claim.ClaimType)))
-                {
-                    addClaims.Add(new(claim.ClaimType, claim.ClaimType));
-                }
-                else if (!(claim.IsSelected) && (userHasClaims.Any(x => x.Type == claim.ClaimType)))
-                {
-                    removeClaims.Add(new(claim.ClaimType, claim.ClaimType));
-                }
-            }
-            if (addClaims.Count > 0)
-            {
-                IdentityResult? res = await userManager.AddClaimsAsync(user, addClaims);
-                if (!res.Succeeded)
-                {
-                    ModelState.AddModelError("", "Cannot add selected claims to user");
-                    return View(model);
-                }
-            }
-            if (removeClaims.Count > 0)
-            {
-                IdentityResult? res = await userManager.RemoveClaimsAsync(user, removeClaims);
-                if (!res.Succeeded)
+                IdentityResult? res1 = await userManager.RemoveClaimsAsync(user, userHasClaims);
+                if (!res1.Succeeded)
                 {
                     ModelState.AddModelError("", "Cannot remove user existing claims");
                     return View(model);
                 }
             }
+
+            IdentityResult? res = await userManager.AddClaimsAsync(user, model.Claims.Select(x=>new Claim(x.ClaimType,x.IsSelected?"true":"false")));
+            if (!res.Succeeded)
+            {
+                ModelState.AddModelError("", "cannot add selected claims to user");
+                return View(model);
+            }
+
+            //List<Claim> removeClaims = new List<Claim>();
+            //List<Claim> addClaims = new List<Claim>();
+
+            //foreach (UserClaim claim in model.Claims)
+            //{
+            //    if (claim.IsSelected && !(userHasClaims.Any(x => x.Type == claim.ClaimType)))
+            //    {
+            //        addClaims.Add(new(claim.ClaimType, claim.ClaimType));
+            //    }
+            //    else if (!(claim.IsSelected) && (userHasClaims.Any(x => x.Type == claim.ClaimType)))
+            //    {
+            //        removeClaims.Add(new(claim.ClaimType, claim.ClaimType));
+            //    }
+            //}
+            //if (addClaims.Count > 0)
+            //{
+            //    IdentityResult? res = await userManager.AddClaimsAsync(user, addClaims);
+            //    if (!res.Succeeded)
+            //    {
+            //        ModelState.AddModelError("", "Cannot add selected claims to user");
+            //        return View(model);
+            //    }
+            //}
+            //if (removeClaims.Count > 0)
+            //{
+            //    IdentityResult? res = await userManager.RemoveClaimsAsync(user, removeClaims);
+            //    if (!res.Succeeded)
+            //    {
+            //        ModelState.AddModelError("", "Cannot remove user existing claims");
+            //        return View(model);
+            //    }
+            //}
 
             return RedirectToAction("EditUser", new { id = model.UserId });
         }

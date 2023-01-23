@@ -12,28 +12,36 @@
 
     foreach (var role in Model)
     {
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                Role Id : @role.Id
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title">@role.Name</h5>
-                            </div>
-                            <div class="card-footer">
-                                <form asp-action="DeleteRole" asp-route-id=@role.Id method="post">
-                                    <a  class="btn btn-primary" asp-action="editrole" asp-controller="administration" asp-route-id=@role.Id>Edit</a>
-                                    <span id="confirmDeleteSpan_@role.Id" style="display:none">
-                                    <span>Are you sure you want to delete?</span>
-                                    <button type="submit" class="btn btn-danger">Yes</button>
-                                    <span class="btn btn-primary"
-                                    onclick="confirmDelete('@role.Id', false)">No</span>
-                                    </span>
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Role Id : @role.Id
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@role.Name</h5>
+                    </div>
+                    <div class="card-footer">
+                        <form asp-action="DeleteRole" asp-route-id=@role.Id method="post">
+                    @if ((await authorizationService.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+                        {
+                                  <a  class="btn btn-primary" asp-action="editrole" asp-controller="administration" asp-route-id=@role.Id>Edit</a>
 
-                                <span id="deleteSpan_@role.Id">
-                                    <span class="btn btn-danger"
+
+                        }
+                    @if ((await authorizationService.AuthorizeAsync(User, "DeleteRolePolicy")).Succeeded)
+                    {
+                        <span id="confirmDeleteSpan_@role.Id" style="display:none">
+                            <span>Are you sure you want to delete?</span>
+                            <button type="submit" class="btn btn-danger">Yes</button>
+                            <span class="btn btn-primary"
+                                    onclick="confirmDelete('@role.Id', false)">No</span>
+                        </span>
+
+                        <span id="deleteSpan_@role.Id">
+                            <span class="btn btn-danger"
                                     onclick="confirmDelete('@role.Id', true)">Delete</span>
-                                </span>
-                                </form>
+                        </span>
+                    }
+                        </form>
                               
                             </div>
                         </div>

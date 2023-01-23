@@ -35,8 +35,16 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 
 builder.Services.AddAuthorization(option =>
 {
-    option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role")
-                                                                                .RequireClaim("Create Role"));
+    option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role","true")
+                                                                                /*.RequireClaim("Create Role")*/);
+    //option.AddPolicy("EditRolePolicy", policy => policy.RequireClaim("Edit Role","true"));
+
+    //custom authorization policy using func
+    option.AddPolicy("EditRolePolicy", policy
+                    => policy.RequireAssertion(context =>
+                    (context.User.IsInRole("Admin") &&
+                    context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
+                    context.User.IsInRole("Super Admin")));
 
     option.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
 });
