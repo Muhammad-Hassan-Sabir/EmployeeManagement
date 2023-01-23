@@ -1,4 +1,5 @@
 using EmployeeManagement.Models;
+using EmployeeManagement.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -40,14 +41,26 @@ builder.Services.AddAuthorization(option =>
     //option.AddPolicy("EditRolePolicy", policy => policy.RequireClaim("Edit Role","true"));
 
     //custom authorization policy using func
-    option.AddPolicy("EditRolePolicy", policy
-                    => policy.RequireAssertion(context =>
-                    (context.User.IsInRole("Admin") &&
-                    context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
-                    context.User.IsInRole("Super Admin")));
+    //option.AddPolicy("EditRolePolicy", policy
+    //                => policy.RequireAssertion(context =>
+    //                (context.User.IsInRole("Admin") &&
+    //                context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
+    //                context.User.IsInRole("Super Admin")));
+
+    //Custom authorization requirement and handler
+
+    option.AddPolicy("EditRolePolicy", policy =>
+    {
+        policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement());
+    });
+
 
     option.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
 });
+builder.Services.AddSingleton<IAuthorizationHandler,CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+
+
+
 
 
 
