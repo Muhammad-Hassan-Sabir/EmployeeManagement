@@ -21,7 +21,7 @@
                     </div>
                     <div class="card-footer">
                         <form asp-action="DeleteRole" asp-route-id=@role.Id method="post">
-                    @if ((await authorizationService.AuthorizeAsync(User, "EditRolePolicy")).Succeeded)
+                    @if ((await authorizationService.AuthorizeAsync(User, "EditRoleClaimPolicy")).Succeeded)
                         {
                                   <a  class="btn btn-primary" asp-action="editrole" asp-controller="administration" asp-route-id=@role.Id>Edit</a>
 

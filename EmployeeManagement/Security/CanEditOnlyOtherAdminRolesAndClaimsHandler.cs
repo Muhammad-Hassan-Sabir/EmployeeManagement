@@ -16,7 +16,7 @@ namespace EmployeeManagement.Security
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ManageAdminRolesAndClaimsRequirement requirement)
         {
-            string? adminIdBeingEdited = _httpContextAccessor.HttpContext.GetRouteValue("id").ToString();
+            string? adminIdBeingEdited = _httpContextAccessor.HttpContext.GetRouteValue("id")?.ToString();
             if (adminIdBeingEdited is null)
             {
                 return Task.CompletedTask;

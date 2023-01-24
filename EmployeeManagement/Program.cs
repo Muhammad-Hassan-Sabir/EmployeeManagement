@@ -38,27 +38,35 @@ builder.Services.AddAuthorization(option =>
 {
     option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role","true")
                                                                                 /*.RequireClaim("Create Role")*/);
+
+    option.AddPolicy("EditRoleClaimPolicy", policy => policy.RequireClaim("Edit Role", "true"));
+
     //option.AddPolicy("EditRolePolicy", policy => policy.RequireClaim("Edit Role","true"));
 
-    //custom authorization policy using func
-    //option.AddPolicy("EditRolePolicy", policy
-    //                => policy.RequireAssertion(context =>
-    //                (context.User.IsInRole("Admin") &&
-    //                context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
-    //                context.User.IsInRole("Super Admin")));
+   //custom authorization policy using func
+   //option.AddPolicy("EditRolePolicy", policy
+   //                => policy.RequireAssertion(context =>
+   //                (context.User.IsInRole("Admin") &&
+   //                context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
+   //                context.User.IsInRole("Super Admin")));
 
-    //Custom authorization requirement and handler
+   //Custom authorization requirement and handler
 
-    option.AddPolicy("EditRolePolicy", policy =>
+   option.AddPolicy("EditRolePolicy", policy =>
     {
         policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement());
     });
 
 
     option.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
+
+    //If you do not want the rest of the handlers to be called, 
+    //when a failure is returned, set InvokeHandlersAfterFailure property to false.The default is true.
+    //option.InvokeHandlersAfterFailure = false;
+
 });
 builder.Services.AddSingleton<IAuthorizationHandler,CanEditOnlyOtherAdminRolesAndClaimsHandler>();
-
+builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 
 
 
