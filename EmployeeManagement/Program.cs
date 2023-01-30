@@ -67,11 +67,18 @@ builder.Services.AddAuthorization(option =>
 });
 builder.Services.AddSingleton<IAuthorizationHandler,CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
-builder.Services.AddAuthentication().AddGoogle(option =>
+builder.Services.AddAuthentication()
+    .AddGoogle(option =>
 {
-    option.ClientId = "XXXXXXXX";
-    option.ClientSecret = "XXXXXX";
+    option.ClientId = "";
+    option.ClientSecret = "";
+})
+    .AddFacebook(option =>
+{
+    option.AppId = "";
+    option.AppSecret= "";
 });
+   
 
 
 

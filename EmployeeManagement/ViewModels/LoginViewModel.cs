@@ -5,6 +5,7 @@ namespace EmployeeManagement.ViewModels
 {
     public class LoginViewModel
     {
+      
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -19,7 +20,7 @@ namespace EmployeeManagement.ViewModels
         public string? ReturnUrl { get; set; }
 
         // AuthenticationScheme is in Microsoft.AspNetCore.Authentication namespace
-        public IList<AuthenticationScheme> ExternalLogins{ get; set; }
+        public IList<AuthenticationScheme> ExternalLogins{ get; set; }=new List<AuthenticationScheme>();
 
     }
 }
