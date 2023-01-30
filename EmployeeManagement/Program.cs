@@ -67,8 +67,11 @@ builder.Services.AddAuthorization(option =>
 });
 builder.Services.AddSingleton<IAuthorizationHandler,CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
-
-
+builder.Services.AddAuthentication().AddGoogle(option =>
+{
+    option.ClientId = "XXXXXXXX";
+    option.ClientSecret = "XXXXXX";
+});
 
 
 
