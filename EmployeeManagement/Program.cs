@@ -70,13 +70,13 @@ builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 builder.Services.AddAuthentication()
     .AddGoogle(option =>
 {
-    option.ClientId = "611420949232-3ak1kke7l19elib50ilrbltm9u1gv8nj.apps.googleusercontent.com";
-    option.ClientSecret = "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";
+    option.ClientId = "";
+    option.ClientSecret = "";
 })
     .AddFacebook(option =>
 {
-    option.AppId = "1184917889052902";
-    option.AppSecret = "6167fdaa34122dfa02436815e97625f5";
+    option.AppId = "";
+    option.AppSecret = "";
 });
 
 var app = builder.Build();
