@@ -31,56 +31,53 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 {
     options.Password.RequiredUniqueChars = 3;
     options.Password.RequiredLength = 10;
+    options.SignIn.RequireConfirmedEmail = true;
 })
-.AddEntityFrameworkStores<AppDbContext>();
+.AddEntityFrameworkStores<AppDbContext>()
+.AddDefaultTokenProviders();
 
 builder.Services.AddAuthorization(option =>
 {
-    option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role","true")
+    option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role", "true")
                                                                                 /*.RequireClaim("Create Role")*/);
 
     option.AddPolicy("EditRoleClaimPolicy", policy => policy.RequireClaim("Edit Role", "true"));
 
     //option.AddPolicy("EditRolePolicy", policy => policy.RequireClaim("Edit Role","true"));
 
-   //custom authorization policy using func
-   //option.AddPolicy("EditRolePolicy", policy
-   //                => policy.RequireAssertion(context =>
-   //                (context.User.IsInRole("Admin") &&
-   //                context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
-   //                context.User.IsInRole("Super Admin")));
+    //custom authorization policy using func
+    //option.AddPolicy("EditRolePolicy", policy
+    //                => policy.RequireAssertion(context =>
+    //                (context.User.IsInRole("Admin") &&
+    //                context.User.HasClaim(claim => claim.Type == "Edite Role" && claim.Value == "true")) ||
+    //                context.User.IsInRole("Super Admin")));
 
-   //Custom authorization requirement and handler
+    //Custom authorization requirement and handler
 
-   option.AddPolicy("EditRolePolicy", policy =>
-    {
-        policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement());
-    });
-
+    option.AddPolicy("EditRolePolicy", policy =>
+     {
+         policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement());
+     });
 
     option.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
 
-    //If you do not want the rest of the handlers to be called, 
+    //If you do not want the rest of the handlers to be called,
     //when a failure is returned, set InvokeHandlersAfterFailure property to false.The default is true.
     //option.InvokeHandlersAfterFailure = false;
-
 });
-builder.Services.AddSingleton<IAuthorizationHandler,CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+builder.Services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 builder.Services.AddAuthentication()
     .AddGoogle(option =>
 {
-    option.ClientId = "";
-    option.ClientSecret = "";
+    option.ClientId = "611420949232-3ak1kke7l19elib50ilrbltm9u1gv8nj.apps.googleusercontent.com";
+    option.ClientSecret = "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";
 })
     .AddFacebook(option =>
 {
-    option.AppId = "";
-    option.AppSecret= "";
+    option.AppId = "1184917889052902";
+    option.AppSecret = "6167fdaa34122dfa02436815e97625f5";
 });
-   
-
-
 
 var app = builder.Build();
 
