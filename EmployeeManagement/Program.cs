@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using NLog.Extensions.Logging;
+using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,10 @@ var builder = WebApplication.CreateBuilder(args);
 //builder.Services.AddRazorPages();
 
 //log configuration
+
 builder.Logging.ClearProviders();
 builder.Logging.AddNLog();
+
 //Add Authorization Policy Globally
 builder.Services.AddMvc(options =>
 {

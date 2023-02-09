@@ -3,7 +3,6 @@
     ViewData["Title"] = "Login";
 }
 
-
 <div class="row">
     <div class="col-md-6">
         <h1>Local Account Login</h1>
@@ -29,37 +28,38 @@
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">Login</button>
+            <div>
+                <a asp-action="ForgotPassword">Forgot Password?</a>
+            </div>
         </form>
-        
+
     </div>
 
     <div class="col-md-6">
         <h1>External Login</h1>
         <hr />
         @{
-        @if (Model.ExternalLogins.Count==0)
-        {
-              <div>No external logins configured</div>
-        }
-        else
-        {
-        <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
-            <div>
-        @foreach (var provider in Model.ExternalLogins)
-        {
-                        <button type="submit" class="btn btn-primary" style="width:auto"
-                        name="provider" value="@provider.Name"
-                        title="Log in using your @provider.DisplayName account">
-                        @provider.DisplayName
-                        </button>
-        }
-            </div>
-        </form>
-        }
+            @if (Model.ExternalLogins.Count == 0)
+            {
+                                              <div>No external logins configured</div>
+            }
+            else
+            {
+                                        <form method="post" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl">
+                                            <div>
+                        @foreach (var provider in Model.ExternalLogins)
+                        {
+                                                                        <button type="submit" class="btn btn-primary" style="width:auto"
+                                        name="provider" value="@provider.Name"
+                                        title="Log in using your @provider.DisplayName account">
+                                @provider.DisplayName
+                                                                        </button>
+                        }
+                                            </div>
+                                        </form>
+            }
 
         }
     </div>
 
-
 </div>
-
