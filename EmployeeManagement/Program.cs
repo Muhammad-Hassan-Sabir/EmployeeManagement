@@ -39,6 +39,11 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
+//Change Token Life Span of all token types
+builder.Services.Configure<DataProtectionTokenProviderOptions>(option =>
+                    option.TokenLifespan = TimeSpan.FromHours(5));
+//end//
+
 builder.Services.AddAuthorization(option =>
 {
     option.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("Delete Role", "true")
