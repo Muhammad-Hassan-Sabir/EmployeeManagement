@@ -35,13 +35,20 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     options.Password.RequiredUniqueChars = 3;
     options.Password.RequiredLength = 10;
     options.SignIn.RequireConfirmedEmail = true;
+
+    options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
 })
 .AddEntityFrameworkStores<AppDbContext>()
-.AddDefaultTokenProviders();
+.AddDefaultTokenProviders()
+.AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>("CustomEmailConfirmation");
 
 //Change Token Life Span of all token types
 builder.Services.Configure<DataProtectionTokenProviderOptions>(option =>
                     option.TokenLifespan = TimeSpan.FromHours(5));
+// Changes token lifespan of just the Email Confirmation Token type
+builder.Services.Configure<CustomEmailConfirmationTokenProviderOptions>(option =>
+                    option.TokenLifespan = TimeSpan.FromDays(3));
+
 //end//
 
 builder.Services.AddAuthorization(option =>
@@ -75,17 +82,22 @@ builder.Services.AddAuthorization(option =>
 });
 builder.Services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
-builder.Services.AddAuthentication()
-    .AddGoogle(option =>
-{
-    option.ClientId = "";
-    option.ClientSecret = "";
-})
-    .AddFacebook(option =>
-{
-    option.AppId = "";
-    option.AppSecret = "";
-});
+
+// CONFIGURE EXTERNAL LOGIN
+
+//builder.Services.AddAuthentication()
+//    .AddGoogle(option =>
+//{
+//    option.ClientId = "";
+//    option.ClientSecret = "";
+//})
+//    .AddFacebook(option =>
+//{
+//    option.AppId = "";
+//    option.AppSecret = "";
+//});
+
+/// END //////
 
 var app = builder.Build();
 
