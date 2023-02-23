@@ -5,11 +5,14 @@
 @{
     ViewBag.Title = "Edit Employee";
     var photoPath = "~/images/" + (Model.ExistingPhotoPath ?? "noimage.png");
+    var id = Model.Id;
+    Console.WriteLine(id);
 }
 
 <form enctype="multipart/form-data" asp-controller="home" asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input hidden asp-for="ExistingPhotoPath" />
-    <input hidden asp-for="Id"/>
+    <input hidden asp-for="Id" value="@Model.Id"/>
     <div class="form-group row">
 
         <label asp-for="Name" class="col-sm-2 col-form-label">Name</label>
@@ -44,13 +47,12 @@
        <div class="col-sm-3">
           <div class="custom-file">
                   <input asp-for="Photo" class="custom-file-input form-control">
-               
+
             </div>
        </div>
-    </div> 
+    </div>
     <div class="form-group row pt-1">
 
-        
        <div class="col-sm-3 offset-2">
         <img class="imageThumbnail" src="@photoPath" asp-append-version="true" />
        </div>
@@ -63,9 +65,7 @@
         </div>
     </div>
 
-
-
-@*    @section Scripts {
+    @*    @section Scripts {
                 <script>
                     $(document).ready(function () {
                         $('.custom-file-input').on("change", function () {

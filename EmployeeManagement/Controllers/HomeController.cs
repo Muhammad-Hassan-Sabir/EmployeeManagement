@@ -1,6 +1,8 @@
 ﻿using EmployeeManagement.Models;
+using EmployeeManagement.Security;
 using EmployeeManagement.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
@@ -11,30 +13,49 @@ namespace EmployeeManagement.Controllers
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IWebHostEnvironment webHostEnvironment;
 
-        public HomeController(IEmployeeRepository employeeRepository, IWebHostEnvironment webHostEnvironment)
+        // It is through IDataProtector interface Protect and Unprotect methods,
+        // we encrypt and decrypt respectively
+        private readonly IDataProtector protector;
+
+        // It is the CreateProtector() method of IDataProtectionProvider interface
+        // that creates an instance of IDataProtector. CreateProtector() requires
+        // a purpose string. So both IDataProtectionProvider and the class that
+        // contains our purpose strings are injected using the contructor
+        public HomeController(IEmployeeRepository employeeRepository, IWebHostEnvironment webHostEnvironment,
+                              IDataProtectionProvider dataProtectionProvider, DataProtectionPurposeStrings dataProtectionPurposeStrings)
         {
             _employeeRepository = employeeRepository;
             this.webHostEnvironment = webHostEnvironment;
+            // Pass the purpose string as a parameter
+            protector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.EmployeeIdRouteValue);
         }
 
         [AllowAnonymous]
         public ViewResult Index()
         {
             // retrieve all the employees
-            var model = _employeeRepository.GetAllEmployee();
+            var model = _employeeRepository.GetAllEmployee()
+                                        .Select(x =>
+                                        {
+                                            // Encrypt the ID value and store in EncryptedId property
+                                            x.EncryptedId = protector.Protect(Convert.ToString(x.Id));
+                                            return x;
+                                        });
             // Pass the list of employees to the view
             return View(model);
         }
 
+        // Details view receives the encrypted employee ID
         [AllowAnonymous]
-        public ViewResult Details(int? id)
+        public ViewResult Details(string id)
         {
-            //throw new Exception("Error in Details View");
-            Employee employee = _employeeRepository.GetEmployee(id ?? 1);
+            // Decrypt the employee id using Unprotect method
+            int? decryptId = Convert.ToInt32(protector.Unprotect(id));
+            Employee employee = _employeeRepository.GetEmployee(decryptId ?? 1);
             if (employee is null)
             {
                 Response.StatusCode = (int)HttpStatusCode.NotFound;
-                return View("EmployeeNotFound", id.Value);
+                return View("EmployeeNotFound", decryptId);
             }
 
             HomeDetailsViewModel homeDetailsViewModel = new HomeDetailsViewModel()
@@ -53,9 +74,10 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(int Id)
+        public IActionResult Edit(string id)
         {
-            var employee = _employeeRepository.GetEmployee(Id);
+            int decryptId = Convert.ToInt32(protector.Unprotect(id));
+            var employee = _employeeRepository.GetEmployee(decryptId);
 
             EmployeeEditViewModel editViewModel = new EmployeeEditViewModel()
             {

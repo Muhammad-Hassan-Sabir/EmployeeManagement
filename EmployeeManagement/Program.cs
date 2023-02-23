@@ -82,6 +82,7 @@ builder.Services.AddAuthorization(option =>
 });
 builder.Services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 builder.Services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+builder.Services.AddSingleton<DataProtectionPurposeStrings>();
 
 // CONFIGURE EXTERNAL LOGIN
 
